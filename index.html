@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Whatsapp API Server</title>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+	<style>
+		/* Agrega estilos personalizados aquí si es necesario */
+	</style>
+</head>
+
+<body>
+
+	<div class="container">
+		<div class="row">
+			<div class="col s12">
+				<h1 class="center-align">Whatsapp API Server</h1>
+				<div class="center-align">
+					<img src="" alt="QR Code" id="qrcode" class="responsive-img" style="display: none;">
+				</div>
+				<h3 class="center-align">Logs:</h3>
+				<ul class="collection logs"></ul>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+	<script>
+		$(document).ready(function () {
+			var socket = io();
+
+			socket.on('message', function (msg) {
+				$('.logs').append($('<li>').addClass('collection-item').text(msg));
+			});
+
+			socket.on('qr', function (src) {
+				$('#qrcode').attr('src', src);
+				$('#qrcode').show();
+			});
+
+			socket.on('ready', function (data) {
+				$('#qrcode').hide();
+			});
+
+			socket.on('authenticated', function (data) {
+				$('#qrcode').hide();
+			});
+		});
+	</script>
+</body>
+
+</html>
