@@ -10,6 +10,8 @@ const axios = require('axios');
 const mime = require('mime-types');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
+const dotenv = require('dotenv').config();
+
 
 const port = process.env.PORT || 8000;
 
@@ -41,13 +43,11 @@ app.get('/', (req, res) => {
 
 
 // Secret key for signing JWT
-const secretKey = 'myincrediblystrongsecretkey2023';
+const secretKey = process.env.SECRET_KEY;
 
-// Sample user data (you can replace this with your own user database)
-const users = [
-  { username: 'user', password: '123' },
-  { username: 'user2', password: 'password2' },
-];
+// Users array
+
+const users = process.env.USERS.split(',')  ;
 
 const client = new Client({
   authStrategy: new LocalAuth(
@@ -120,10 +120,9 @@ io.on('connection', function (socket) {
 });
 
 app.post('/login', (req, res) => {
-  const { username, password } = req.body;
-
-  // Find the user in the database (you should query your database here)
-  const user = users.find((user) => user.username === username && user.password === password);
+  const { username } = req.body;
+ 
+  const user = users.find((user) => user === username);
 
   if (!user) {
     // Return an error if authentication fails

@@ -4,3 +4,4 @@ package-lock.json
 downloaded-media/
 .wwebjs_auth/
 .wwebjs_cache/
+.env
