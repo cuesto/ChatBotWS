@@ -16,11 +16,13 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.20.0",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-fileupload": "^1.2.0",
     "express-validator": "^6.9.2",
     "http": "0.0.1-security",
+    "jsonwebtoken": "^9.0.2",
     "mime-types": "^2.1.32",
     "qrcode": "^1.4.4",
     "socket.io": "2.3.0",
