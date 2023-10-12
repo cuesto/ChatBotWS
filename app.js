@@ -51,7 +51,6 @@ const users = process.env.USERS.split(',')  ;
 
 const client = new Client({
   authStrategy: new LocalAuth(
-    // { clientId: 'bot-IMS' }
   ),
   puppeteer: {
     headless: true,
@@ -90,7 +89,6 @@ io.on('connection', function (socket) {
 
 
   client.on('message', msg => {
-    //console.log(msg.body);
     if (msg.body == 'ping') {
       const phoneNumber = '18096019002@c.us'
       client.sendMessage(phoneNumber, "Hello World")
@@ -136,29 +134,6 @@ app.post('/login', (req, res) => {
   res.header('auth-token', token).status(200).json({
     error: null,
     data: { token }
-  });
-});
-
-
-// Example protected route that requires a valid token
-app.get('/protected', (req, res) => {
-  // Verify the JWT token sent in the request
-  const token = req.headers.authorization;
-
-  if (!token) {
-    return res.status(401).json({ message: 'Token not provided' });
-  }
-
-  //sustraer el token del header
-  const tokenBearer = token.split(' ');
-
-  jwt.verify(tokenBearer[1], secretKey, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: err });
-    }
-
-    // Token is valid, you can proceed with the protected action
-    res.status(200).json({ message: 'Protected resource accessed' });
   });
 });
 
