@@ -8,6 +8,10 @@ const { phoneNumberFormatter } = require('./helpers/formatter');
 const fileUpload = require('express-fileupload');
 const axios = require('axios');
 const mime = require('mime-types');
+const jwt = require('jsonwebtoken');
+const bodyParser = require('body-parser');
+const dotenv = require('dotenv').config();
+
 
 const port = process.env.PORT || 8000;
 
@@ -29,15 +33,24 @@ app.use(cors({
   //origin: 'https://ims-spa.web.app'
 }));
 
+app.use(bodyParser.json());
+
 app.get('/', (req, res) => {
   res.sendFile('index.html', {
     root: __dirname
   });
 });
 
+
+// Secret key for signing JWT
+const secretKey = process.env.SECRET_KEY;
+
+// Users array
+
+const users = process.env.USERS.split(',')  ;
+
 const client = new Client({
   authStrategy: new LocalAuth(
-    // { clientId: 'bot-IMS' }
   ),
   puppeteer: {
     headless: true,
@@ -74,8 +87,8 @@ io.on('connection', function (socket) {
     socket.emit('message', 'Whatsapp is ready!');
   });
 
+
   client.on('message', msg => {
-    console.log(msg.body);
     if (msg.body == 'ping') {
       const phoneNumber = '18096019002@c.us'
       client.sendMessage(phoneNumber, "Hello World")
@@ -90,7 +103,7 @@ io.on('connection', function (socket) {
   });
 
   client.on('change_state', state => {
-    console.log('BOT-ZDG Status: ', state);
+    console.log('Status: ', state);
   });
 
   client.on('auth_failure', function (session) {
@@ -104,41 +117,75 @@ io.on('connection', function (socket) {
   });
 });
 
+app.post('/login', (req, res) => {
+  const { username } = req.body;
+ 
+  const user = users.find((user) => user === username);
 
+  if (!user) {
+    // Return an error if authentication fails
+    return res.status(401).json({ message: 'Authentication failed' });
+  }
+
+  // Generate a JWT token upon successful authentication
+  const token = jwt.sign({ username: user.username }, secretKey, { expiresIn: '1h' });
+
+  // Set the 'auth-token' header and send the token as part of the response
+  res.header('auth-token', token).status(200).json({
+    error: null,
+    data: { token }
+  });
+});
 
 // Send message
 app.post('/send-message', [
   body('number').notEmpty(),
   body('message').notEmpty(),
 ], async (req, res) => {
-  const errors = validationResult(req).formatWith(({
-    msg
-  }) => {
-    return msg;
-  });
 
-  if (!errors.isEmpty()) {
-    return res.status(422).json({
-      status: false,
-      message: errors.mapped()
-    });
+  // Verify the JWT token sent in the request
+  const token = req.headers.authorization;
+
+  if (!token) {
+    return res.status(401).json({ message: 'Token not provided' });
   }
 
-  const number = req.body.number + '@c.us';
-  const message = req.body.message;
+  //sustraer el token del header
+  const tokenBearer = token.split(' ');
 
-  console.log(number);
-  console.log(message);
-
-  client.sendMessage(number, message).then(response => {
-    res.status(200).json({
-      status: true,
-      response: response
+  jwt.verify(tokenBearer[1], secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: err });
+    }
+    const errors = validationResult(req).formatWith(({
+      msg
+    }) => {
+      return msg;
     });
-  }).catch(err => {
-    res.status(500).json({
-      status: false,
-      response: err
+
+    if (!errors.isEmpty()) {
+      return res.status(422).json({
+        status: false,
+        message: errors.mapped()
+      });
+    }
+
+    const number = req.body.number + '@c.us';
+    const message = req.body.message;
+
+    console.log(number);
+    console.log(message);
+
+    client.sendMessage(number, message).then(response => {
+      res.status(200).json({
+        status: true,
+        response: response
+      });
+    }).catch(err => {
+      res.status(500).json({
+        status: false,
+        response: err
+      });
     });
   });
 });
