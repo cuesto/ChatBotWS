@@ -12,11 +12,13 @@ RUN npm cache clean --force
 RUN npm i whatsapp-web.js@1.22.2-alpha.1 
 
 RUN npm i 
-#--production
+
+RUN rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 COPY . ./
 RUN rm -rf .wwebjs_auth .wwebjs_cache
 
 EXPOSE 8000
 
-CMD npm run start:dev
+CMD npm run start
+#:dev
