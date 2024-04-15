@@ -47,7 +47,10 @@ const secretKey = process.env.SECRET_KEY;
 
 // Users array
 
-const users = process.env.USERS.split(',')  ;
+const users = process.env.USERS;
+if(users){
+  users = users.split(',');
+}
 
 const client = new Client({
   authStrategy: new LocalAuth(
