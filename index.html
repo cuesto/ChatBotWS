@@ -32,22 +32,36 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
 	<script>
 		$(document).ready(function () {
+			const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            const description = urlParams.get('description');
+			console.log(id);
+			console.log(description);
 			var socket = io();
 
+			if (id && description) {
+                socket.emit('create-session', { id, description });
+            }
+
 			socket.on('message', function (msg) {
-				$('.logs').append($('<li>').addClass('collection-item').text(msg));
+				console.log('message', msg);
+				$('.logs').append($('<li>').addClass('collection-item').text(msg.text));
 			});
 
-			socket.on('qr', function (src) {
-				$('#qrcode').attr('src', src);
+			socket.on('qr', function (data) {
+				console.log('qr', data);
+				$('#qrcode').attr('src', data.src);
 				$('#qrcode').show();
+				
 			});
 
 			socket.on('ready', function (data) {
+				console.log('ready', data);
 				$('#qrcode').hide();
 			});
 
 			socket.on('authenticated', function (data) {
+				console.log('authenticated', data);
 				$('#qrcode').hide();
 			});
 		});
