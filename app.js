@@ -43,12 +43,12 @@ app.get('/', (req, res) => {
 
 
 // Secret key for signing JWT
-const secretKey = process.env.SECRET_KEY;
+const secretKey = "C0mm4n1c4t10n123567vs"//process.env.SECRET_KEY;
 
 // Users array
 
-const users = process.env.USERS;
-if(users){
+var users = "D5kW1Vn9fuQ3fLmXOmb2SH3fI612,jcuesto"//process.env.USERS;
+if (users) {
   users = users.split(',');
 }
 
