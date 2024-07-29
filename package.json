@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node app.js",
     "start:dev": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:digitalocean": "npm install --production=true && npm ci"
   },
   "keywords": [
     "whatsapp-api",
@@ -32,5 +33,9 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
+  },
+  "engines": {
+    "node": "18.20.2",
+    "npm": "10.5.2"
   }
 }
